@@ -1,6 +1,6 @@
 version: '3.3'
 
-networks:
+#networks:
 #  web:
 #    external: true
 #  internal:
@@ -49,15 +49,15 @@ services:
     labels:
       - traefik.enable=false
 
-  adminer:
-    image: adminer:4.6.3-standalone
-    labels:
-      - traefik.backend=adminer
-      - traefik.frontend.rule=Host:db-admin.jaccard.us
-      - traefik.docker.network=web
-      - traefik.port=8091
-    depends_on:
-      - db
+#  adminer:
+#    image: adminer:4.6.3-standalone
+#    labels:
+#      - traefik.backend=adminer
+#      - traefik.frontend.rule=Host:db-admin.jaccard.us
+#      - traefik.docker.network=web
+#      - traefik.port=8091
+#    depends_on:
+#      - db
 #    networks:
 #      - internal
 #      - web
