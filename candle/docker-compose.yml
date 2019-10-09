@@ -1,10 +1,11 @@
 version: '3.3'
 
-#networks:
-#  web:
-#    external: true
-#  internal:
-#    external: false
+networks:
+  outside:
+    external:
+      name: traefik_proxy-net
+  inside:
+  
 
 services:
   wordpress:
@@ -14,6 +15,9 @@ services:
     volumes:
       - /home/blog/candle/site:/var/www/html
       - /home/blog/candle/conf/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    networks:
+      - outside
+      - inside
 #    ports:
 #      - 8088:80
     restart: always
@@ -26,10 +30,23 @@ services:
         # VIRTUAL_HOST: candle.jaccard.us
 
     labels:
-      - traefik.backend=wordpress
-      - traefik.frontend.rule=Host:candle.jaccard.us
-      - traefik.docker.network=web
-      - traefix.port=80
+      - "traefik.enable=true"
+      - "traefik.docker.network=outside"
+      - "traefik.http.routers.wordpress.rule=Host(`candle.jaccard.us`)"
+      - "traefik.http.routers.wordpress.entrypoints=web"
+
+# From a guide, v2 redirect example
+#    - "traefik.http.routers.wordpress.middlewares=https-redirect"
+#    - "traefik.http.routers.wordpress-secure.rule=Host(`www.${DOMAIN}`) || Host(`${DOMAIN}`)"
+#    - "traefik.http.routers.wordpress-secure.entrypoints=websecure"
+#    - "traefik.http.routers.wordpress-secure.tls.certresolver=myhttpchallenge"
+
+# Old v1 config, do not use.
+#      - traefik.backend=wordpress
+#      - traefik.frontend.rule=Host:candle.jaccard.us
+#      - traefik.docker.network=web
+#      - traefix.port=80
+
 #    networks:
 #      - internal
 #      - web
@@ -44,8 +61,8 @@ services:
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: CFAS2mPxNaVm2qU2YkHH
-#    networks:
-#      - internal
+    networks:
+      - inside
     labels:
       - traefik.enable=false
 
