@@ -1,0 +1,8 @@
+#
+# Dynamic Configuration
+#
+#http:
+#  routers:
+#    whoami:
+#      rule: "Path(`/whoami`)"
+#      entrypoints: "web"

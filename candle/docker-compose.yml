@@ -1,0 +1,64 @@
+version: '3.3'
+
+networks:
+#  web:
+#    external: true
+#  internal:
+#    external: false
+
+services:
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    volumes:
+      - /home/blog/candle/site:/var/www/html
+      - /home/blog/candle/conf/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+#    ports:
+#      - 8088:80
+    restart: always
+    environment:
+        WORDPRESS_DB_HOST: db:3306
+        WORDPRESS_DB_USER: wordpress
+        WORDPRESS_DB_PASSWORD: CFAS2mPxNaVm2qU2YkHH
+
+        # This was for nginx-proxy, but didn't seem to work
+        # VIRTUAL_HOST: candle.jaccard.us
+
+    labels:
+      - traefik.backend=wordpress
+      - traefik.frontend.rule=Host:candle.jaccard.us
+      - traefik.docker.network=web
+      - traefix.port=80
+#    networks:
+#      - internal
+#      - web
+
+  db:
+    image: mysql:5.7
+    volumes:
+      - /home/blog/candle/mysql:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 2sgved3qGy3w6Gp7BeyM
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: CFAS2mPxNaVm2qU2YkHH
+#    networks:
+#      - internal
+    labels:
+      - traefik.enable=false
+
+  adminer:
+    image: adminer:4.6.3-standalone
+    labels:
+      - traefik.backend=adminer
+      - traefik.frontend.rule=Host:db-admin.jaccard.us
+      - traefik.docker.network=web
+      - traefik.port=8091
+    depends_on:
+      - db
+#    networks:
+#      - internal
+#      - web
+
