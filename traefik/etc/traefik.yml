@@ -8,6 +8,8 @@ providers:
 entryPoints:
   web:
     address: ":80"
+  web-secure:
+    address: ":443"
 
 log:
   level: "DEBUG"
@@ -15,4 +17,4 @@ log:
 api:
 #  insecure: true
   dashboard: true
-#  debug: true
+  debug: true
