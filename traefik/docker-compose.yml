@@ -7,11 +7,7 @@ services:
   traefik:
     image: traefik:2.0
     container_name: "traefik"
-    #command:  
-      #- "--api.insecure=true"
-      #- "--providers.docker=true"
     networks: 
-      - default
       - proxy-net
     ports:
       - "80:80"
@@ -22,17 +18,15 @@ services:
     labels:
       - "traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)"
       - "traefik.http.routers.api.service=api@internal"
-      - "traefik.http.routers.api.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=candle:$$apr1$$GJcfHrzt$$y0bXlYcUmxLEI8KG1zjY5/"
+      - "traefik.http.routers.api.middlewares=http_basic_auth"
+      - "traefik.http.middlewares.http_basic_auth.basicauth.usersfile=/etc/traefik/http_basic_auth_users"
 
   whoami:
     image: containous/whoami
     container_name: "whoami"
     networks: 
       - proxy-net
-    #ports:
-      #- "80:80"
     labels:
-#      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
-      - "traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)"
       - "traefik.http.routers.whoami.entrypoints=web"
+      - "traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)"
+      - "traefik.http.routers.whoami.middlewares=http_basic_auth"
