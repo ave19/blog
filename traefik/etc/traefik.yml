@@ -18,3 +18,21 @@ api:
 #  insecure: true
   dashboard: true
   debug: true
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "candle@jaccard.us"
+#      caServer: foobar
+      storage: "/etc/traefik/acme.json"
+#      keyType: foobar
+#      dnsChallenge:
+#        provider: foobar
+#        delayBeforeCheck: 42
+#        resolvers:
+#        - foobar
+#        - foobar
+#        disablePropagationCheck: true
+      httpChallenge:
+        entryPoint: "web"
+#      tlsChallenge: {}
