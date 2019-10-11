@@ -2,6 +2,8 @@ version: '3'
 
 networks:
   proxy-net:
+    external:
+      name: "proxy-net"
 
 services:
   traefik:
@@ -11,11 +13,13 @@ services:
       - proxy-net
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
     volumes:
       - /home/blog/traefik/etc:/etc/traefik
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
+      - "traefik.docker.network=proxy-net"
       - "traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)"
       - "traefik.http.routers.api.service=api@internal"
       - "traefik.http.routers.api.middlewares=http_basic_auth"
@@ -27,6 +31,30 @@ services:
     networks: 
       - proxy-net
     labels:
-      - "traefik.http.routers.whoami.entrypoints=web"
-      - "traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)"
+# Unencrypted
+#      - "traefik.http.routers.whoami.entrypoints=web"
+#      - "traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)"
+#      - "traefik.http.routers.whoami.middlewares=http_basic_auth"
+
+# SSL Let's Encrypt Test 1
+# This didn't work because there's no domain in the rule.  
+#      - "traefik.http.routers.whoami.entrypoints=web-secure"
+#      - "traefik.http.routers.whoami.rule=PathPrefix(`/whoami`)"
+#      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+
+# SSL Let's Encrypt Test 2
+# Worked!
+#      - "traefik.http.routers.whoami.entrypoints=web-secure"
+#      - "traefik.http.routers.whoami.rule=Host(`monitor.jaccard.us`)"
+#      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+
+# SSL Let's Encrypt Test 3
+# This also works, added http basic auth
+      - "traefik.http.routers.whoami.entrypoints=web-secure"
+      - "traefik.http.routers.whoami.rule=Host(`monitor.jaccard.us`)"
+      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
       - "traefik.http.routers.whoami.middlewares=http_basic_auth"
+
+
+
+
