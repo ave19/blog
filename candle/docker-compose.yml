@@ -3,7 +3,7 @@ version: '3.3'
 networks:
   outside:
     external:
-      name: traefik_proxy-net
+      name: proxy-net
   inside:
   
 
@@ -16,8 +16,8 @@ services:
       - /home/blog/candle/site:/var/www/html
       - /home/blog/candle/conf/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     networks:
-      - outside
       - inside
+      - outside
 #    ports:
 #      - 8088:80
     restart: always
@@ -31,9 +31,23 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=outside"
-      - "traefik.http.routers.wordpress.rule=Host(`candle.jaccard.us`)"
-      - "traefik.http.routers.wordpress.entrypoints=web"
+      - "traefik.docker.network=proxy-net"
+
+      # HTTP to HTTPS redirect middleware
+      - "traefik.http.middlewares.wordpress-http-redirect.redirectScheme.scheme=https"
+      - "traefik.http.middlewares.wordpress-http-redirect.redirectScheme.permanent=true"
+
+      # http target
+      - "traefik.http.routers.wordpress-http.entrypoints=web"
+      - "traefik.http.routers.wordpress-http.rule=Host(`candle.jaccard.us`)"
+      - "traefik.http.routers.wordpress-http.middlewares=wordpress-http-redirect"
+
+      # https target
+      - "traefik.http.routers.wordpress-https.entrypoints=web-secure"
+      - "traefik.http.routers.wordpress-https.rule=Host(`candle.jaccard.us`)"
+      - "traefik.http.routers.wordpress-https.tls=true"
+      - "traefik.http.routers.wordpress-https.tls.certresolver=letsencrypt"
+
 
 # From a guide, v2 redirect example
 #    - "traefik.http.routers.wordpress.middlewares=https-redirect"
