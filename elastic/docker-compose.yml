@@ -1,0 +1,173 @@
+version: '3.3'
+
+networks:
+  inside:
+    external:
+      name: elastic-net
+
+services:
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.4.0
+    container_name: kibana
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+    networks:
+      - inside
+    environment:
+      SERVER_NAME: kibana
+      #ELASTICSEARCH_HOSTS: es-01,es-02,es-03
+      # XPACK_MONITORING_ENABLED
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kibana-https.entrypoints=web-secure"
+      - "traefik.http.routers.kibana-https.rule=Host(`kibana.jaccard.us`)"
+      - "traefik.http.routers.kibana-https.tls=true"
+      - "traefik.http.routers.kibana-https.tls.certresolver=letsencrypt"
+      # I need to route traffic to 5601 from 443
+      - "traefik.http.services.kibana-https.loadbalancer.server.port=5601"
+
+
+
+  es-01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    container_name: es-01
+    environment:
+      - node.name=es-01
+      - network.host=es-01
+      - discovery.seed_hosts=es-01,es-02,es-03
+      - cluster.initial_master_nodes=es-01,es-02,es-03
+      - cluster.name=blog
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=true
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.keystore.path=elastic-certificates.p12
+      - xpack.security.transport.ssl.keystore.type=PKCS12
+      - xpack.security.transport.ssl.truststore.path=elastic-certificates.p12
+      - xpack.security.transport.ssl.truststore.type=PKCS12
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes: 
+      - /home/blog/elastic/es-01-data:/usr/share/elasticsearch/data
+      - /home/blog/elastic/elastic-certificates.p12:/usr/share/elasticsearch/config/elastic-certificates.p12
+    networks:
+      - inside
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.es-01-https.entrypoints=web-secure"
+      - "traefik.http.routers.es-01-https.rule=Host(`elastic.jaccard.us`)"
+      - "traefik.http.routers.es-01-https.tls=true"
+      - "traefik.http.routers.es-01-https.tls.certresolver=letsencrypt"
+      # I need to route traffic to 9200 from 443
+      - "traefik.http.services.es-01-https.loadbalancer.server.port=9200"
+
+  es-02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    container_name: es-02
+    environment:
+      - node.name=es-02
+      - discovery.seed_hosts=es-01,es-02,es-03
+      - cluster.initial_master_nodes=es-01,es-02,es-03
+      - cluster.name=blog
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=true
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.keystore.path=elastic-certificates.p12
+      - xpack.security.transport.ssl.keystore.type=PKCS12
+      - xpack.security.transport.ssl.truststore.path=elastic-certificates.p12
+      - xpack.security.transport.ssl.truststore.type=PKCS12
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes: 
+      - /home/blog/elastic/es-02-data:/usr/share/elasticsearch/data
+      - /home/blog/elastic/elastic-certificates.p12:/usr/share/elasticsearch/config/elastic-certificates.p12
+    networks:
+      - inside
+    labels:
+      - "traefik.enable=true"
+      #- "traefik.docker.network=elastic-net"
+      - "traefik.http.routers.es-02-https.entrypoints=web-secure"
+      - "traefik.http.routers.es-02-https.rule=Host(`elastic.jaccard.us`)"
+      - "traefik.http.routers.es-02-https.tls=true"
+      - "traefik.http.routers.es-02-https.tls.certresolver=letsencrypt"
+      # I need to route traffic to 9200 from 443
+      - "traefik.http.services.es-02-https.loadbalancer.server.port=9200"
+
+  es-03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    container_name: es-03
+    environment:
+      - node.name=es-03
+      - discovery.seed_hosts=es-01,es-02,es-03
+      - cluster.initial_master_nodes=es-01,es-02,es-03
+      - cluster.name=blog
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=true
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.keystore.path=elastic-certificates.p12
+      - xpack.security.transport.ssl.keystore.type=PKCS12
+      - xpack.security.transport.ssl.truststore.path=elastic-certificates.p12
+      - xpack.security.transport.ssl.truststore.type=PKCS12
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes: 
+      - /home/blog/elastic/es-03-data:/usr/share/elasticsearch/data
+      - /home/blog/elastic/elastic-certificates.p12:/usr/share/elasticsearch/config/elastic-certificates.p12
+    networks:
+      - inside
+    labels:
+      - "traefik.enable=true"
+      #- "traefik.docker.network=elastic-net"
+      - "traefik.http.routers.es-03-https.entrypoints=web-secure"
+      - "traefik.http.routers.es-03-https.rule=Host(`elastic.jaccard.us`)"
+      - "traefik.http.routers.es-03-https.tls=true"
+      - "traefik.http.routers.es-03-https.tls.certresolver=letsencrypt"
+      # I need to route traffic to 9200 from 443
+      - "traefik.http.services.es-03-https.loadbalancer.server.port=9200"
+
+
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.docker.network=proxy-net"
+#
+#      # HTTP to HTTPS redirect middleware
+#      - "traefik.http.middlewares.wordpress-http-redirect.redirectScheme.scheme=https"
+#      - "traefik.http.middlewares.wordpress-http-redirect.redirectScheme.permanent=true"
+#
+#      # http target
+#      - "traefik.http.routers.wordpress-http.entrypoints=web"
+#      - "traefik.http.routers.wordpress-http.rule=Host(`candle.jaccard.us`)"
+#      - "traefik.http.routers.wordpress-http.middlewares=wordpress-http-redirect"
+#
+#      # https target
+#      - "traefik.http.routers.wordpress-https.entrypoints=web-secure"
+#      - "traefik.http.routers.wordpress-https.rule=Host(`candle.jaccard.us`)"
+#      - "traefik.http.routers.wordpress-https.tls=true"
+#      - "traefik.http.routers.wordpress-https.tls.certresolver=letsencrypt"
+
+
+# From a guide, v2 redirect example
+#    - "traefik.http.routers.wordpress.middlewares=https-redirect"
+#    - "traefik.http.routers.wordpress-secure.rule=Host(`www.${DOMAIN}`) || Host(`${DOMAIN}`)"
+#    - "traefik.http.routers.wordpress-secure.entrypoints=websecure"
+#    - "traefik.http.routers.wordpress-secure.tls.certresolver=myhttpchallenge"
+
+# Old v1 config, do not use.
+#      - traefik.backend=wordpress
+#      - traefik.frontend.rule=Host:candle.jaccard.us
+#      - traefik.docker.network=web
+#      - traefix.port=80
+
