@@ -4,6 +4,12 @@ networks:
   proxy-net:
     external:
       name: "proxy-net"
+  candle-net:
+    external:
+      name: "candle-net"
+  elastic-net:
+    external:
+      name: "elastic-net"
 
 services:
   traefik:
@@ -11,6 +17,8 @@ services:
     container_name: "traefik"
     networks: 
       - proxy-net
+      - candle-net
+      - elastic-net
     ports:
       - "80:80"
       - "443:443"
