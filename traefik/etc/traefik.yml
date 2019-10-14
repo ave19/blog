@@ -5,6 +5,9 @@
 providers:
   docker: {}
 
+accessLog:
+  format: "json"
+
 entryPoints:
   web:
     address: ":80"
@@ -13,6 +16,7 @@ entryPoints:
 
 log:
   level: "DEBUG"
+  format: "json"
 
 api:
 #  insecure: true
