@@ -28,6 +28,9 @@ services:
         # VIRTUAL_HOST: candle.jaccard.us
 
     labels:
+
+      # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      # Traefik Labels
       - "traefik.enable=true"
 
       # HTTP to HTTPS redirect middleware
@@ -45,22 +48,13 @@ services:
       - "traefik.http.routers.wordpress-https.tls=true"
       - "traefik.http.routers.wordpress-https.tls.certresolver=letsencrypt"
 
+      # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      # Filebeat Labels
+      # These are used by autodiscover with hints enabled.  I think.
+      - "co.elastic.logs/module=apache2" 
+      - "co.elastic.logs/fileset.stdout=access" 
+      - "co.elastic.logs/fileset.stderr=error" 
 
-# From a guide, v2 redirect example
-#    - "traefik.http.routers.wordpress.middlewares=https-redirect"
-#    - "traefik.http.routers.wordpress-secure.rule=Host(`www.${DOMAIN}`) || Host(`${DOMAIN}`)"
-#    - "traefik.http.routers.wordpress-secure.entrypoints=websecure"
-#    - "traefik.http.routers.wordpress-secure.tls.certresolver=myhttpchallenge"
-
-# Old v1 config, do not use.
-#      - traefik.backend=wordpress
-#      - traefik.frontend.rule=Host:candle.jaccard.us
-#      - traefik.docker.network=web
-#      - traefix.port=80
-
-#    networks:
-#      - internal
-#      - web
 
   db:
     image: mysql:5.7
