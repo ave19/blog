@@ -1,0 +1,48 @@
+version: "3"
+
+networks:
+  elastic-net:
+    external:
+      name: "elastic-net"
+
+# configs:
+#   filebeat_config:
+#     file: /home/blog/bb/filebeat/filebeat.yml
+
+services:
+
+  # How to Tune Elastic Beats Performance: A Practical Example with Batch Size, Worker Count, and More
+  # https://www.elastic.co/blog/how-to-tune-elastic-beats-performance-a-practical-example-with-batch-size-worker-count-and-more?blade=tw&hulk=social
+  filebeat-docker:
+    image: docker.elastic.co/beats/filebeat:7.4.0
+    container_name: filebeat-docker
+    hostname: "filebeat-docker"
+    # Need to override user so we can access the log files, and docker.sock
+    user: root
+    networks:
+      - elastic-net
+#    configs:
+#      - source: filebeat_config
+#        target: /usr/share/filebeat/filebeat.yml
+    volumes:
+      - /home/blog/bb/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /home/blog/bb/filebeat/data:/usr/share/filebeat/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      # This is needed for filebeat to load container log path as specified in filebeat.yml
+      - /home/docker/containers/:/var/lib/docker/containers/:ro
+
+      # # This is needed for filebeat to load jenkins build log path as specified in filebeat.yml
+      # - /var/lib/docker/volumes/jenkins_home/_data/jobs/:/var/lib/docker/volumes/jenkins_home/_data/jobs/:ro
+
+      # This is needed for filebeat to load logs for system and auth modules
+      - /var/log/:/var/log/:ro
+      # This is needed for filebeat to load logs for auditd module
+      - /var/log/audit/:/var/log/audit/:ro
+    # environment:
+      # - ELASTICSEARCH_HOST=es-01,es-02,es-03
+      # - KIBANA_HOST=kibana
+      # - ELASTICSEARCH_USERNAME=elastic
+      # - ELASTICSEARCH_PASSWORD=OnNm6sI1inAi9h8mpx3A
+    # disable strict permission checks
+    command: ["--strict.perms=false"]
+
