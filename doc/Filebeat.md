@@ -38,10 +38,6 @@ Ok, those weren't useful.  I told docker to watch everything, and it did, but it
 It looks like we can apply labels, like Traefik, and push filebeat's docker configuration around on a per container basis.  This is nice, because the per container configs are with that container, and the base filebeat container only needs to be told to listen.
 
 
-> Written with [StackEdit](https://stackedit.io/).
-
-
-> Written with [StackEdit](https://stackedit.io/).
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbOTY4MjMyNDEzXX0=
+eyJoaXN0b3J5IjpbLTE0MjE1NTYwODddfQ==
 -->
