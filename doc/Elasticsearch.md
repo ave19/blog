@@ -36,7 +36,6 @@ Don't forget to `chown ave:users *.p12` on those.
 
 And it's up!
 
-> Written with [StackEdit](https://stackedit.io/).
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4ODE5NTI2NDVdfQ==
+eyJoaXN0b3J5IjpbMjg2MjQzNTgzLC0xODgxOTUyNjQ1XX0=
 -->
