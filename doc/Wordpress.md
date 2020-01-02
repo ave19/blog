@@ -156,9 +156,6 @@ You have to set up the 80 and 443 endpoints, then redirect 80 to 443 with the mi
 I did some `chown -R ...` and suddenly lost the db.  
 The uid:gid for those files is 999.  I set /etc/passwd and /etc/group to show that.
 
-> Written with [StackEdit](https://stackedit.io/).
-
-> Written with [StackEdit](https://stackedit.io/).
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwMjUwNjIyMjRdfQ==
+eyJoaXN0b3J5IjpbLTI4NTAyNzc0LC0yMDI1MDYyMjI0XX0=
 -->
